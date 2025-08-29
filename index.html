@@ -1,1585 +1,174 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Inventario - Pollería El Pollo Dorado</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Pollería</title>
+  <style>
+    /* ====== ESTILOS GENERALES ====== */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
+    header {
+      background: #c62828;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
+    /* ====== MENÚ LATERAL ====== */
+    nav {
+      width: 220px;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding-top: 1rem;
+    }
 
-        .header h1 {
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
+    nav a {
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      display: block;
+      transition: background 0.3s;
+    }
 
-        .nav-tabs {
-            display: flex;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+    nav a:hover {
+      background: #34495e;
+    }
 
-        .tab-btn {
-            flex: 1;
-            min-width: 150px;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            background: #f8f9fa;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
+    /* ====== CONTENIDO PRINCIPAL ====== */
+    main {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
 
-        .tab-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        .tab-content {
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
+    .card h3 {
+      margin-top: 0;
+    }
 
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-        }
-
-        .table-container {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            font-weight: 600;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .status-bajo {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        .status-medio {
-            color: #f39c12;
-            font-weight: bold;
-        }
-
-        .status-alto {
-            color: #27ae60;
-            font-weight: bold;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            color: #7f8c8d;
-            font-weight: 600;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            position: relative;
-            animation: modalFadeIn 0.3s ease;
-        }
-
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .close {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: #aaa;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .alert {
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-
-        .debt-indicator {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .debt-high {
-            background: #ffebee;
-            color: #c62828;
-        }
-
-        .debt-medium {
-            background: #fff8e1;
-            color: #ef6c00;
-        }
-
-        .debt-low {
-            background: #e8f5e8;
-            color: #2e7d32;
-        }
-
-        @media (max-width: 768px) {
-            .nav-tabs {
-                flex-direction: column;
-            }
-            
-            .tab-btn {
-                min-width: 100%;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    /* ====== TABLA DEMO ====== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🍗 Pollería El Pollo Dorado</h1>
-            <p>Sistema Integral de Inventario y Gestión</p>
-        </div>
-
-        <div class="nav-tabs">
-            <button class="tab-btn active" onclick="showTab('inventory')">📦 Inventario</button>
-            <button class="tab-btn" onclick="showTab('staff')">👥 Personal</button>
-            <button class="tab-btn" onclick="showTab('suppliers')">🚚 Proveedores</button>
-            <button class="tab-btn" onclick="showTab('reports')">📊 Reportes</button>
-            <button class="tab-btn" onclick="showTab('config')">⚙️ Configuración</button>
-        </div>
-
-        <!-- Inventario Tab -->
-        <div id="inventory" class="tab-content active">
-            <h2>Gestión de Inventario</h2>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalProducts">0</div>
-                    <div class="stat-label">Productos Registrados</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="lowStockProducts">0</div>
-                    <div class="stat-label">Stock Bajo</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="todayMovements">0</div>
-                    <div class="stat-label">Movimientos Hoy</div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label>Producto:</label>
-                    <select id="productSelect">
-                        <option value="">Seleccionar producto</option>
-                        <option value="pollo">Pollo</option>
-                        <option value="papa">Papa</option>
-                        <option value="verdura">Verdura</option>
-                        <option value="arroz">Arroz</option>
-                        <option value="aceite">Aceite</option>
-                        <option value="sal">Sal</option>
-                        <option value="condimentos">Condimentos</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Tipo de Movimiento:</label>
-                    <select id="movementType">
-                        <option value="entrada">Entrada</option>
-                        <option value="salida">Salida</option>
-                        <option value="desperdicio">Desperdicio</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Cantidad (kg/unidades):</label>
-                    <input type="number" id="quantity" placeholder="Cantidad">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label>Precio por unidad:</label>
-                    <input type="number" step="0.01" id="unitPrice" placeholder="S/. 0.00">
-                </div>
-                <div>
-                    <label>Proveedor:</label>
-                    <select id="supplierSelect">
-                        <option value="">Seleccionar proveedor</option>
-                    </select>
-                </div>
-            </div>
-
-            <button class="btn" onclick="addMovement()">➕ Registrar Movimiento</button>
-            <button class="btn btn-success" onclick="showCurrentStock()">📋 Ver Stock Actual</button>
-
-            <div id="inventoryTable" class="table-container" style="display: none;">
-                <h3>Stock Actual</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Stock Actual</th>
-                            <th>Precio Promedio</th>
-                            <th>Valor Total</th>
-                            <th>Estado</th>
-                            <th>Última Actualización</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventoryTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Personal Tab -->
-        <div id="staff" class="tab-content">
-            <h2>Gestión de Personal</h2>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalStaff">0</div>
-                    <div class="stat-label">Empleados Activos</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalPayroll">S/ 0</div>
-                    <div class="stat-label">Nómina Quincenal</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalDebts">S/ 0</div>
-                    <div class="stat-label">Deudas Pendientes</div>
-                </div>
-            </div>
-
-            <h3>Registrar Nuevo Empleado</h3>
-            <div class="form-row">
-                <div>
-                    <label>Nombre Completo:</label>
-                    <input type="text" id="staffName" placeholder="Nombre del empleado">
-                </div>
-                <div>
-                    <label>DNI:</label>
-                    <input type="text" id="staffDni" placeholder="12345678">
-                </div>
-                <div>
-                    <label>Cargo:</label>
-                    <select id="staffPosition">
-                        <option value="cocinero">Cocinero</option>
-                        <option value="mesero">Mesero</option>
-                        <option value="cajero">Cajero</option>
-                        <option value="limpieza">Limpieza</option>
-                        <option value="administrador">Administrador</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label>Salario Quincenal:</label>
-                    <input type="number" id="staffSalary" value="650" placeholder="650">
-                </div>
-                <div>
-                    <label>Fecha de Ingreso:</label>
-                    <input type="date" id="staffStartDate">
-                </div>
-            </div>
-
-            <button class="btn" onclick="addStaff()">👤 Agregar Empleado</button>
-
-            <h3 style="margin-top: 30px;">Registro de Movimientos</h3>
-            <div class="form-row">
-                <div>
-                    <label>Empleado:</label>
-                    <select id="staffSelectMovement">
-                        <option value="">Seleccionar empleado</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Tipo de Movimiento:</label>
-                    <select id="staffMovementType">
-                        <option value="prestamo">Préstamo</option>
-                        <option value="consumo">Consumo de Producto</option>
-                        <option value="pago">Pago de Salario</option>
-                        <option value="descuento">Descuento</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Monto/Valor:</label>
-                    <input type="number" step="0.01" id="staffAmount" placeholder="Monto en S/.">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Descripción:</label>
-                <textarea id="staffDescription" placeholder="Descripción del movimiento..."></textarea>
-            </div>
-
-            <button class="btn" onclick="addStaffMovement()">💰 Registrar Movimiento</button>
-            <button class="btn btn-success" onclick="showStaffList()">📋 Ver Personal</button>
-
-            <div id="staffTable" class="table-container" style="display: none;">
-                <h3>Lista de Personal</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>DNI</th>
-                            <th>Cargo</th>
-                            <th>Salario Quincenal</th>
-                            <th>Deuda Actual</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="staffTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Proveedores Tab -->
-        <div id="suppliers" class="tab-content">
-            <h2>Gestión de Proveedores</h2>
-            
-            <h3>Registrar Nuevo Proveedor</h3>
-            <div class="form-row">
-                <div>
-                    <label>Nombre/Razón Social:</label>
-                    <input type="text" id="supplierName" placeholder="Nombre del proveedor">
-                </div>
-                <div>
-                    <label>RUC:</label>
-                    <input type="text" id="supplierRuc" placeholder="20123456789">
-                </div>
-                <div>
-                    <label>Teléfono:</label>
-                    <input type="text" id="supplierPhone" placeholder="999 888 777">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div>
-                    <label>Email:</label>
-                    <input type="email" id="supplierEmail" placeholder="proveedor@email.com">
-                </div>
-                <div>
-                    <label>Tipo de Producto:</label>
-                    <select id="supplierProductType">
-                        <option value="carnes">Carnes y Aves</option>
-                        <option value="verduras">Verduras</option>
-                        <option value="granos">Granos y Cereales</option>
-                        <option value="condimentos">Condimentos</option>
-                        <option value="varios">Varios</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Dirección:</label>
-                <textarea id="supplierAddress" placeholder="Dirección completa del proveedor..."></textarea>
-            </div>
-
-            <button class="btn" onclick="addSupplier()">🏢 Agregar Proveedor</button>
-            <button class="btn btn-success" onclick="showSuppliersList()">📋 Ver Proveedores</button>
-
-            <div id="suppliersTable" class="table-container" style="display: none;">
-                <h3>Lista de Proveedores</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>RUC</th>
-                            <th>Tipo de Producto</th>
-                            <th>Teléfono</th>
-                            <th>Email</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="suppliersTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Reportes Tab -->
-        <div id="reports" class="tab-content">
-            <h2>Reportes y Análisis</h2>
-            
-            <div class="form-row">
-                <div>
-                    <label>Tipo de Reporte:</label>
-                    <select id="reportType">
-                        <option value="monthly">Reporte Mensual</option>
-                        <option value="comparison">Comparación entre Meses</option>
-                        <option value="staff-payments">Pagos de Personal</option>
-                        <option value="supplier-summary">Resumen por Proveedor</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Mes:</label>
-                    <input type="month" id="reportMonth">
-                </div>
-            </div>
-
-            <button class="btn" onclick="generateReport()">📊 Generar Reporte</button>
-            <button class="btn btn-success" onclick="exportData()">💾 Exportar Datos</button>
-
-            <div id="reportResults" style="margin-top: 30px;"></div>
-        </div>
-
-        <!-- Configuración Tab -->
-        <div id="config" class="tab-content">
-            <h2>Configuración del Sistema</h2>
-            
-            <h3>Niveles de Stock</h3>
-            <div class="form-row">
-                <div>
-                    <label>Stock Mínimo (%):</label>
-                    <input type="number" id="minStockLevel" value="20" placeholder="20">
-                </div>
-                <div>
-                    <label>Stock Crítico (%):</label>
-                    <input type="number" id="criticalStockLevel" value="10" placeholder="10">
-                </div>
-            </div>
-
-            <h3>Información del Negocio</h3>
-            <div class="form-row">
-                <div>
-                    <label>Nombre del Negocio:</label>
-                    <input type="text" id="businessName" value="Pollería El Pollo Dorado">
-                </div>
-                <div>
-                    <label>RUC del Negocio:</label>
-                    <input type="text" id="businessRuc" placeholder="20123456789">
-                </div>
-            </div>
-
-            <button class="btn" onclick="saveConfig()">💾 Guardar Configuración</button>
-            <button class="btn btn-danger" onclick="clearAllData()">🗑️ Limpiar Todos los Datos</button>
-
-            <div class="alert alert-warning" style="margin-top: 20px;">
-                <strong>⚠️ Nota:</strong> Los datos se guardan en el navegador. Para uso en producción, considera implementar una base de datos real.
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para detalles -->
-    <div id="detailModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="modalContent"></div>
-        </div>
-    </div>
-
-    <script>
-        // Variables globales para almacenar datos
-        let inventoryData = [];
-        let staffData = [];
-        let suppliersData = [];
-        let movementsData = [];
-        let staffMovementsData = [];
-        let config = {
-            minStockLevel: 20,
-            criticalStockLevel: 10,
-            businessName: "Pollería El Pollo Dorado",
-            businessRuc: ""
-        };
-
-        // Datos iniciales de ejemplo
-        function initializeData() {
-            // Proveedores de ejemplo
-            suppliersData = [
-                {
-                    id: 1,
-                    name: "Distribuidora San Juan",
-                    ruc: "20123456789",
-                    phone: "999 888 777",
-                    email: "ventas@sanjuan.com",
-                    productType: "carnes",
-                    address: "Av. Los Aviadores 123, Lima"
-                },
-                {
-                    id: 2,
-                    name: "Mercado Central",
-                    ruc: "20987654321",
-                    phone: "888 777 666",
-                    email: "pedidos@mercadocentral.com",
-                    productType: "verduras",
-                    address: "Jr. Junín 456, Lima"
-                }
-            ];
-
-            // Personal de ejemplo
-            staffData = [
-                {
-                    id: 1,
-                    name: "María González",
-                    dni: "12345678",
-                    position: "cocinero",
-                    salary: 650,
-                    startDate: "2024-01-15",
-                    currentDebt: 150,
-                    active: true
-                },
-                {
-                    id: 2,
-                    name: "Juan Pérez",
-                    dni: "87654321",
-                    position: "mesero",
-                    salary: 650,
-                    startDate: "2024-02-01",
-                    currentDebt: 0,
-                    active: true
-                }
-            ];
-
-            updateSupplierSelect();
-            updateStaffSelect();
-            updateStats();
-        }
-
-        // Función para cambiar tabs
-        function showTab(tabName) {
-            // Ocultar todos los contenidos
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.remove('active'));
-
-            // Remover clase active de todos los botones
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            // Mostrar el tab seleccionado
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // Funciones de Inventario
-        function addMovement() {
-            const product = document.getElementById('productSelect').value;
-            const type = document.getElementById('movementType').value;
-            const quantity = parseFloat(document.getElementById('quantity').value);
-            const price = parseFloat(document.getElementById('unitPrice').value);
-            const supplier = document.getElementById('supplierSelect').value;
-
-            if (!product || !quantity || quantity <= 0) {
-                alert('Por favor complete todos los campos obligatorios');
-                return;
-            }
-
-            const movement = {
-                id: Date.now(),
-                product: product,
-                type: type,
-                quantity: type === 'salida' || type === 'desperdicio' ? -quantity : quantity,
-                price: price || 0,
-                supplier: supplier,
-                date: new Date().toISOString().split('T')[0],
-                timestamp: new Date().toISOString()
-            };
-
-            movementsData.push(movement);
-            updateInventory();
-            updateStats();
-
-            // Limpiar formulario
-            document.getElementById('quantity').value = '';
-            document.getElementById('unitPrice').value = '';
-
-            showAlert('Movimiento registrado correctamente', 'success');
-        }
-
-        function updateInventory() {
-            inventoryData = [];
-            const products = {};
-
-            movementsData.forEach(movement => {
-                if (!products[movement.product]) {
-                    products[movement.product] = {
-                        product: movement.product,
-                        totalQuantity: 0,
-                        totalValue: 0,
-                        movements: 0
-                    };
-                }
-
-                products[movement.product].totalQuantity += movement.quantity;
-                products[movement.product].totalValue += movement.quantity * movement.price;
-                products[movement.product].movements++;
-                products[movement.product].lastUpdate = movement.date;
-                products[movement.product].averagePrice = products[movement.product].totalValue / products[movement.product].totalQuantity;
-            });
-
-            inventoryData = Object.values(products).filter(p => p.totalQuantity > 0);
-        }
-
-        function showCurrentStock() {
-            updateInventory();
-            const tableBody = document.getElementById('inventoryTableBody');
-            const table = document.getElementById('inventoryTable');
-
-            tableBody.innerHTML = '';
-
-            inventoryData.forEach(item => {
-                const row = document.createElement('tr');
-                const stockStatus = getStockStatus(item.totalQuantity);
-                
-                row.innerHTML = `
-                    <td>${capitalizeFirst(item.product)}</td>
-                    <td>${item.totalQuantity.toFixed(2)}</td>
-                    <td>S/ ${(item.averagePrice || 0).toFixed(2)}</td>
-                    <td>S/ ${(item.totalValue || 0).toFixed(2)}</td>
-                    <td class="status-${stockStatus.class}">${stockStatus.text}</td>
-                    <td>${formatDate(item.lastUpdate)}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            table.style.display = 'block';
-        }
-
-        // Funciones de Personal
-        function addStaff() {
-            const name = document.getElementById('staffName').value;
-            const dni = document.getElementById('staffDni').value;
-            const position = document.getElementById('staffPosition').value;
-            const salary = parseFloat(document.getElementById('staffSalary').value);
-            const startDate = document.getElementById('staffStartDate').value;
-
-            if (!name || !dni || !salary || !startDate) {
-                alert('Por favor complete todos los campos');
-                return;
-            }
-
-            const staff = {
-                id: Date.now(),
-                name: name,
-                dni: dni,
-                position: position,
-                salary: salary,
-                startDate: startDate,
-                currentDebt: 0,
-                active: true
-            };
-
-            staffData.push(staff);
-            updateStaffSelect();
-            updateStats();
-
-            // Limpiar formulario
-            document.getElementById('staffName').value = '';
-            document.getElementById('staffDni').value = '';
-            document.getElementById('staffStartDate').value = '';
-
-            showAlert('Empleado agregado correctamente', 'success');
-        }
-
-        function addStaffMovement() {
-            const staffId = parseInt(document.getElementById('staffSelectMovement').value);
-            const type = document.getElementById('staffMovementType').value;
-            const amount = parseFloat(document.getElementById('staffAmount').value);
-            const description = document.getElementById('staffDescription').value;
-
-            if (!staffId || !amount || amount <= 0) {
-                alert('Por favor complete todos los campos obligatorios');
-                return;
-            }
-
-            const movement = {
-                id: Date.now(),
-                staffId: staffId,
-                type: type,
-                amount: amount,
-                description: description,
-                date: new Date().toISOString().split('T')[0],
-                timestamp: new Date().toISOString()
-            };
-
-            staffMovementsData.push(movement);
-
-            // Actualizar deuda del empleado
-            const staff = staffData.find(s => s.id === staffId);
-            if (staff) {
-                if (type === 'prestamo' || type === 'consumo') {
-                    staff.currentDebt += amount;
-                } else if (type === 'pago' || type === 'descuento') {
-                    staff.currentDebt -= amount;
-                }
-            }
-
-            updateStats();
-
-            // Limpiar formulario
-            document.getElementById('staffAmount').value = '';
-            document.getElementById('staffDescription').value = '';
-
-            showAlert(`Movimiento de ${type} registrado correctamente`, 'success');
-        }
-
-        function showStaffList() {
-            const tableBody = document.getElementById('staffTableBody');
-            const table = document.getElementById('staffTable');
-
-            tableBody.innerHTML = '';
-
-            staffData.forEach(staff => {
-                const row = document.createElement('tr');
-                const debtStatus = getDebtStatus(staff.currentDebt);
-                
-                row.innerHTML = `
-                    <td>${staff.name}</td>
-                    <td>${staff.dni}</td>
-                    <td>${capitalizeFirst(staff.position)}</td>
-                    <td>S/ ${staff.salary.toFixed(2)}</td>
-                    <td>S/ ${staff.currentDebt.toFixed(2)} <span class="debt-indicator debt-${debtStatus.class}">${debtStatus.text}</span></td>
-                    <td>${staff.active ? '✅ Activo' : '❌ Inactivo'}</td>
-                    <td>
-                        <button class="btn" onclick="showStaffDetails(${staff.id})">Ver Detalles</button>
-                        <button class="btn btn-danger" onclick="toggleStaffStatus(${staff.id})">${staff.active ? 'Desactivar' : 'Activar'}</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            table.style.display = 'block';
-        }
-
-        // Funciones de Proveedores
-        function addSupplier() {
-            const name = document.getElementById('supplierName').value;
-            const ruc = document.getElementById('supplierRuc').value;
-            const phone = document.getElementById('supplierPhone').value;
-            const email = document.getElementById('supplierEmail').value;
-            const productType = document.getElementById('supplierProductType').value;
-            const address = document.getElementById('supplierAddress').value;
-
-            if (!name || !ruc) {
-                alert('Nombre y RUC son obligatorios');
-                return;
-            }
-
-            const supplier = {
-                id: Date.now(),
-                name: name,
-                ruc: ruc,
-                phone: phone,
-                email: email,
-                productType: productType,
-                address: address,
-                active: true
-            };
-
-            suppliersData.push(supplier);
-            updateSupplierSelect();
-
-            // Limpiar formulario
-            document.getElementById('supplierName').value = '';
-            document.getElementById('supplierRuc').value = '';
-            document.getElementById('supplierPhone').value = '';
-            document.getElementById('supplierEmail').value = '';
-            document.getElementById('supplierAddress').value = '';
-
-            showAlert('Proveedor agregado correctamente', 'success');
-        }
-
-        function showSuppliersList() {
-            const tableBody = document.getElementById('suppliersTableBody');
-            const table = document.getElementById('suppliersTable');
-
-            tableBody.innerHTML = '';
-
-            suppliersData.forEach(supplier => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${supplier.name}</td>
-                    <td>${supplier.ruc}</td>
-                    <td>${capitalizeFirst(supplier.productType)}</td>
-                    <td>${supplier.phone || 'N/A'}</td>
-                    <td>${supplier.email || 'N/A'}</td>
-                    <td>
-                        <button class="btn" onclick="showSupplierDetails(${supplier.id})">Ver Detalles</button>
-                        <button class="btn btn-danger" onclick="deleteSupplier(${supplier.id})">Eliminar</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            table.style.display = 'block';
-        }
-
-        // Funciones de Reportes
-        function generateReport() {
-            const reportType = document.getElementById('reportType').value;
-            const month = document.getElementById('reportMonth').value;
-            const resultsDiv = document.getElementById('reportResults');
-
-            if (!month && (reportType === 'monthly' || reportType === 'comparison')) {
-                alert('Por favor seleccione un mes');
-                return;
-            }
-
-            let reportHtml = '';
-
-            switch (reportType) {
-                case 'monthly':
-                    reportHtml = generateMonthlyReport(month);
-                    break;
-                case 'comparison':
-                    reportHtml = generateComparisonReport(month);
-                    break;
-                case 'staff-payments':
-                    reportHtml = generateStaffPaymentReport();
-                    break;
-                case 'supplier-summary':
-                    reportHtml = generateSupplierReport();
-                    break;
-            }
-
-            resultsDiv.innerHTML = reportHtml;
-        }
-
-        function generateMonthlyReport(month) {
-            const [year, monthNum] = month.split('-');
-            const monthMovements = movementsData.filter(m => m.date.startsWith(month));
-            
-            let entradas = 0, salidas = 0, desperdicios = 0, valorTotal = 0;
-            const productSummary = {};
-
-            monthMovements.forEach(movement => {
-                if (movement.type === 'entrada') entradas += movement.quantity;
-                if (movement.type === 'salida') salidas += Math.abs(movement.quantity);
-                if (movement.type === 'desperdicio') desperdicios += Math.abs(movement.quantity);
-                
-                valorTotal += movement.quantity * movement.price;
-
-                if (!productSummary[movement.product]) {
-                    productSummary[movement.product] = { entradas: 0, salidas: 0, desperdicios: 0 };
-                }
-                
-                if (movement.type === 'entrada') productSummary[movement.product].entradas += movement.quantity;
-                if (movement.type === 'salida') productSummary[movement.product].salidas += Math.abs(movement.quantity);
-                if (movement.type === 'desperdicio') productSummary[movement.product].desperdicios += Math.abs(movement.quantity);
-            });
-
-            let html = `
-                <div class="table-container">
-                    <h3>📊 Reporte Mensual - ${getMonthName(monthNum)} ${year}</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">${entradas.toFixed(2)}</div>
-                            <div class="stat-label">Total Entradas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${salidas.toFixed(2)}</div>
-                            <div class="stat-label">Total Salidas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${desperdicios.toFixed(2)}</div>
-                            <div class="stat-label">Desperdicios</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">S/ ${valorTotal.toFixed(2)}</div>
-                            <div class="stat-label">Valor Total</div>
-                        </div>
-                    </div>
-                    
-                    <h4>Resumen por Producto</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Entradas</th>
-                                <th>Salidas</th>
-                                <th>Desperdicios</th>
-                                <th>Stock Final</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            Object.entries(productSummary).forEach(([product, data]) => {
-                const stockFinal = data.entradas - data.salidas - data.desperdicios;
-                html += `
-                    <tr>
-                        <td>${capitalizeFirst(product)}</td>
-                        <td>${data.entradas.toFixed(2)}</td>
-                        <td>${data.salidas.toFixed(2)}</td>
-                        <td>${data.desperdicios.toFixed(2)}</td>
-                        <td>${stockFinal.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-
-            html += '</tbody></table></div>';
-            return html;
-        }
-
-        function generateComparisonReport(month) {
-            const [year, monthNum] = month.split('-');
-            const currentMonth = month;
-            const prevMonth = getPreviousMonth(month);
-
-            const currentData = getMonthData(currentMonth);
-            const prevData = getMonthData(prevMonth);
-
-            return `
-                <div class="table-container">
-                    <h3>📈 Comparación Mensual</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Métrica</th>
-                                <th>${getMonthName(prevMonth.split('-')[1])} ${prevMonth.split('-')[0]}</th>
-                                <th>${getMonthName(monthNum)} ${year}</th>
-                                <th>Variación</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Total Entradas</td>
-                                <td>${prevData.entradas.toFixed(2)}</td>
-                                <td>${currentData.entradas.toFixed(2)}</td>
-                                <td class="${currentData.entradas > prevData.entradas ? 'status-alto' : 'status-bajo'}">
-                                    ${((currentData.entradas - prevData.entradas) / prevData.entradas * 100).toFixed(1) || 0}%
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Total Salidas</td>
-                                <td>${prevData.salidas.toFixed(2)}</td>
-                                <td>${currentData.salidas.toFixed(2)}</td>
-                                <td class="${currentData.salidas > prevData.salidas ? 'status-alto' : 'status-bajo'}">
-                                    ${((currentData.salidas - prevData.salidas) / prevData.salidas * 100).toFixed(1) || 0}%
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Desperdicios</td>
-                                <td>${prevData.desperdicios.toFixed(2)}</td>
-                                <td>${currentData.desperdicios.toFixed(2)}</td>
-                                <td class="${currentData.desperdicios < prevData.desperdicios ? 'status-alto' : 'status-bajo'}">
-                                    ${((currentData.desperdicios - prevData.desperdicios) / prevData.desperdicios * 100).toFixed(1) || 0}%
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        function generateStaffPaymentReport() {
-            const currentMonth = new Date().toISOString().slice(0, 7);
-            const monthMovements = staffMovementsData.filter(m => m.date.startsWith(currentMonth));
-
-            let html = `
-                <div class="table-container">
-                    <h3>💰 Reporte de Pagos de Personal - ${getMonthName(currentMonth.split('-')[1])} ${currentMonth.split('-')[0]}</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Empleado</th>
-                                <th>Salario Quincenal</th>
-                                <th>Préstamos</th>
-                                <th>Consumos</th>
-                                <th>Pagos Realizados</th>
-                                <th>Deuda Actual</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            staffData.forEach(staff => {
-                const employeeMovements = monthMovements.filter(m => m.staffId === staff.id);
-                const prestamos = employeeMovements.filter(m => m.type === 'prestamo').reduce((sum, m) => sum + m.amount, 0);
-                const consumos = employeeMovements.filter(m => m.type === 'consumo').reduce((sum, m) => sum + m.amount, 0);
-                const pagos = employeeMovements.filter(m => m.type === 'pago').reduce((sum, m) => sum + m.amount, 0);
-                const debtStatus = getDebtStatus(staff.currentDebt);
-
-                html += `
-                    <tr>
-                        <td>${staff.name}</td>
-                        <td>S/ ${staff.salary.toFixed(2)}</td>
-                        <td>S/ ${prestamos.toFixed(2)}</td>
-                        <td>S/ ${consumos.toFixed(2)}</td>
-                        <td>S/ ${pagos.toFixed(2)}</td>
-                        <td>S/ ${staff.currentDebt.toFixed(2)}</td>
-                        <td><span class="debt-indicator debt-${debtStatus.class}">${debtStatus.text}</span></td>
-                    </tr>
-                `;
-            });
-
-            html += '</tbody></table></div>';
-            return html;
-        }
-
-        function generateSupplierReport() {
-            const supplierMovements = {};
-
-            movementsData.forEach(movement => {
-                if (movement.supplier) {
-                    if (!supplierMovements[movement.supplier]) {
-                        supplierMovements[movement.supplier] = {
-                            totalQuantity: 0,
-                            totalValue: 0,
-                            movements: 0
-                        };
-                    }
-                    supplierMovements[movement.supplier].totalQuantity += movement.quantity;
-                    supplierMovements[movement.supplier].totalValue += movement.quantity * movement.price;
-                    supplierMovements[movement.supplier].movements++;
-                }
-            });
-
-            let html = `
-                <div class="table-container">
-                    <h3>🚚 Resumen por Proveedor</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Proveedor</th>
-                                <th>RUC</th>
-                                <th>Total Compras</th>
-                                <th>Valor Total</th>
-                                <th>N° Movimientos</th>
-                                <th>Contacto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            Object.entries(supplierMovements).forEach(([supplierId, data]) => {
-                const supplier = suppliersData.find(s => s.id == supplierId);
-                if (supplier) {
-                    html += `
-                        <tr>
-                            <td>${supplier.name}</td>
-                            <td>${supplier.ruc}</td>
-                            <td>${data.totalQuantity.toFixed(2)}</td>
-                            <td>S/ ${data.totalValue.toFixed(2)}</td>
-                            <td>${data.movements}</td>
-                            <td>${supplier.phone || 'N/A'}</td>
-                        </tr>
-                    `;
-                }
-            });
-
-            html += '</tbody></table></div>';
-            return html;
-        }
-
-        // Funciones auxiliares
-        function updateSupplierSelect() {
-            const select = document.getElementById('supplierSelect');
-            select.innerHTML = '<option value="">Seleccionar proveedor</option>';
-            
-            suppliersData.forEach(supplier => {
-                const option = document.createElement('option');
-                option.value = supplier.id;
-                option.textContent = `${supplier.name} (${supplier.ruc})`;
-                select.appendChild(option);
-            });
-        }
-
-        function updateStaffSelect() {
-            const select = document.getElementById('staffSelectMovement');
-            select.innerHTML = '<option value="">Seleccionar empleado</option>';
-            
-            staffData.filter(staff => staff.active).forEach(staff => {
-                const option = document.createElement('option');
-                option.value = staff.id;
-                option.textContent = `${staff.name} - ${capitalizeFirst(staff.position)}`;
-                select.appendChild(option);
-            });
-        }
-
-        function updateStats() {
-            updateInventory();
-            
-            document.getElementById('totalProducts').textContent = inventoryData.length;
-            document.getElementById('lowStockProducts').textContent = inventoryData.filter(p => p.totalQuantity < 50).length;
-            
-            const today = new Date().toISOString().split('T')[0];
-            const todayMovements = movementsData.filter(m => m.date === today);
-            document.getElementById('todayMovements').textContent = todayMovements.length;
-
-            const activeStaff = staffData.filter(s => s.active);
-            document.getElementById('totalStaff').textContent = activeStaff.length;
-            
-            const totalPayroll = activeStaff.reduce((sum, staff) => sum + staff.salary, 0);
-            document.getElementById('totalPayroll').textContent = `S/ ${totalPayroll.toFixed(2)}`;
-            
-            const totalDebts = activeStaff.reduce((sum, staff) => sum + staff.currentDebt, 0);
-            document.getElementById('totalDebts').textContent = `S/ ${totalDebts.toFixed(2)}`;
-        }
-
-        function getStockStatus(quantity) {
-            if (quantity < 20) return { class: 'bajo', text: 'Stock Bajo' };
-            if (quantity < 50) return { class: 'medio', text: 'Stock Medio' };
-            return { class: 'alto', text: 'Stock Bueno' };
-        }
-
-        function getDebtStatus(debt) {
-            if (debt > 500) return { class: 'high', text: 'Alta' };
-            if (debt > 200) return { class: 'medium', text: 'Media' };
-            return { class: 'low', text: 'Baja' };
-        }
-
-        function getMonthData(month) {
-            const monthMovements = movementsData.filter(m => m.date.startsWith(month));
-            let entradas = 0, salidas = 0, desperdicios = 0;
-
-            monthMovements.forEach(movement => {
-                if (movement.type === 'entrada') entradas += movement.quantity;
-                if (movement.type === 'salida') salidas += Math.abs(movement.quantity);
-                if (movement.type === 'desperdicio') desperdicios += Math.abs(movement.quantity);
-            });
-
-            return { entradas, salidas, desperdicios };
-        }
-
-        function getPreviousMonth(month) {
-            const date = new Date(month + '-01');
-            date.setMonth(date.getMonth() - 1);
-            return date.toISOString().slice(0, 7);
-        }
-
-        function getMonthName(monthNum) {
-            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                           'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            return months[parseInt(monthNum) - 1];
-        }
-
-        function capitalizeFirst(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return 'N/A';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('es-PE');
-        }
-
-        function showAlert(message, type) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            
-            document.querySelector('.tab-content.active').insertBefore(alertDiv, document.querySelector('.tab-content.active').firstChild);
-            
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 3000);
-        }
-
-        function showStaffDetails(staffId) {
-            const staff = staffData.find(s => s.id === staffId);
-            const movements = staffMovementsData.filter(m => m.staffId === staffId);
-
-            let movementsHtml = '<h4>Historial de Movimientos</h4><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Monto</th><th>Descripción</th></tr></thead><tbody>';
-            
-            movements.forEach(movement => {
-                movementsHtml += `
-                    <tr>
-                        <td>${formatDate(movement.date)}</td>
-                        <td>${capitalizeFirst(movement.type)}</td>
-                        <td>S/ ${movement.amount.toFixed(2)}</td>
-                        <td>${movement.description || 'N/A'}</td>
-                    </tr>
-                `;
-            });
-            
-            movementsHtml += '</tbody></table>';
-
-            document.getElementById('modalContent').innerHTML = `
-                <h3>👤 Detalles de ${staff.name}</h3>
-                <p><strong>DNI:</strong> ${staff.dni}</p>
-                <p><strong>Cargo:</strong> ${capitalizeFirst(staff.position)}</p>
-                <p><strong>Salario Quincenal:</strong> S/ ${staff.salary.toFixed(2)}</p>
-                <p><strong>Fecha de Ingreso:</strong> ${formatDate(staff.startDate)}</p>
-                <p><strong>Deuda Actual:</strong> S/ ${staff.currentDebt.toFixed(2)}</p>
-                <br>
-                ${movementsHtml}
-            `;
-            document.getElementById('detailModal').style.display = 'block';
-        }
-
-        function showSupplierDetails(supplierId) {
-            const supplier = suppliersData.find(s => s.id === supplierId);
-            const movements = movementsData.filter(m => m.supplier == supplierId);
-
-            let movementsHtml = '<h4>Historial de Compras</h4><table><thead><tr><th>Fecha</th><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr></thead><tbody>';
-            
-            movements.forEach(movement => {
-                const total = movement.quantity * movement.price;
-                movementsHtml += `
-                    <tr>
-                        <td>${formatDate(movement.date)}</td>
-                        <td>${capitalizeFirst(movement.product)}</td>
-                        <td>${movement.quantity.toFixed(2)}</td>
-                        <td>S/ ${movement.price.toFixed(2)}</td>
-                        <td>S/ ${total.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-            
-            movementsHtml += '</tbody></table>';
-
-            document.getElementById('modalContent').innerHTML = `
-                <h3>🏢 Detalles de ${supplier.name}</h3>
-                <p><strong>RUC:</strong> ${supplier.ruc}</p>
-                <p><strong>Tipo de Producto:</strong> ${capitalizeFirst(supplier.productType)}</p>
-                <p><strong>Teléfono:</strong> ${supplier.phone || 'N/A'}</p>
-                <p><strong>Email:</strong> ${supplier.email || 'N/A'}</p>
-                <p><strong>Dirección:</strong> ${supplier.address || 'N/A'}</p>
-                <br>
-                ${movementsHtml}
-            `;
-            document.getElementById('detailModal').style.display = 'block';
-        }
-
-        function toggleStaffStatus(staffId) {
-            const staff = staffData.find(s => s.id === staffId);
-            if (staff) {
-                staff.active = !staff.active;
-                updateStaffSelect();
-                updateStats();
-                showStaffList();
-                showAlert(`Empleado ${staff.active ? 'activado' : 'desactivado'} correctamente`, 'success');
-            }
-        }
-
-        function deleteSupplier(supplierId) {
-            if (confirm('¿Está seguro de eliminar este proveedor?')) {
-                suppliersData = suppliersData.filter(s => s.id !== supplierId);
-                updateSupplierSelect();
-                showSuppliersList();
-                showAlert('Proveedor eliminado correctamente', 'success');
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('detailModal').style.display = 'none';
-        }
-
-        function saveConfig() {
-            config.minStockLevel = parseInt(document.getElementById('minStockLevel').value);
-            config.criticalStockLevel = parseInt(document.getElementById('criticalStockLevel').value);
-            config.businessName = document.getElementById('businessName').value;
-            config.businessRuc = document.getElementById('businessRuc').value;
-            
-            showAlert('Configuración guardada correctamente', 'success');
-        }
-
-        function clearAllData() {
-            if (confirm('⚠️ ¿Está seguro de limpiar todos los datos? Esta acción no se puede deshacer.')) {
-                inventoryData = [];
-                staffData = [];
-                suppliersData = [];
-                movementsData = [];
-                staffMovementsData = [];
-                
-                initializeData();
-                updateStats();
-                
-                showAlert('Todos los datos han sido limpiados', 'warning');
-            }
-        }
-
-        function exportData() {
-            const data = {
-                inventory: inventoryData,
-                staff: staffData,
-                suppliers: suppliersData,
-                movements: movementsData,
-                staffMovements: staffMovementsData,
-                config: config,
-                exportDate: new Date().toISOString()
-            };
-
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `polleria_backup_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            
-            URL.revokeObjectURL(url);
-            showAlert('Datos exportados correctamente', 'success');
-        }
-
-        // Inicializar la aplicación
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeData();
-            
-            // Establecer fecha actual por defecto
-            const today = new Date();
-            document.getElementById('staffStartDate').value = today.toISOString().split('T')[0];
-            document.getElementById('reportMonth').value = today.toISOString().slice(0, 7);
-
-            // Agregar algunos movimientos de ejemplo
-            const exampleMovements = [
-                {
-                    id: 1,
-                    product: 'pollo',
-                    type: 'entrada',
-                    quantity: 50,
-                    price: 8.5,
-                    supplier: '1',
-                    date: new Date().toISOString().split('T')[0],
-                    timestamp: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    product: 'papa',
-                    type: 'entrada',
-                    quantity: 100,
-                    price: 2.5,
-                    supplier: '2',
-                    date: new Date().toISOString().split('T')[0],
-                    timestamp: new Date().toISOString()
-                },
-                {
-                    id: 3,
-                    product: 'pollo',
-                    type: 'salida',
-                    quantity: 15,
-                    price: 8.5,
-                    supplier: '',
-                    date: new Date().toISOString().split('T')[0],
-                    timestamp: new Date().toISOString()
-                }
-            ];
-
-            movementsData.push(...exampleMovements);
-            updateStats();
-
-            // Agregar algunos movimientos de personal de ejemplo
-            const exampleStaffMovements = [
-                {
-                    id: 1,
-                    staffId: 1,
-                    type: 'prestamo',
-                    amount: 100,
-                    description: 'Préstamo personal',
-                    date: new Date().toISOString().split('T')[0],
-                    timestamp: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    staffId: 1,
-                    type: 'consumo',
-                    amount: 50,
-                    description: 'Consumo de almuerzo',
-                    date: new Date().toISOString().split('T')[0],
-                    timestamp: new Date().toISOString()
-                }
-            ];
-
-            staffMovementsData.push(...exampleStaffMovements);
-            
-            // Actualizar deudas iniciales
-            staffData[0].currentDebt = 150;
-            
-            updateStats();
-        });
-
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('detailModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
-    </script>
+  <header>
+    <h1>🐔 Sistema de Gestión - Pollería</h1>
+  </header>
+
+  <div class="container">
+    <!-- Menú lateral -->
+    <nav>
+      <a href="#" onclick="mostrar('dashboard')">📊 Dashboard</a>
+      <a href="#" onclick="mostrar('sucursales')">🏬 Sucursales</a>
+      <a href="#" onclick="mostrar('productos')">🥦 Productos</a>
+      <a href="#" onclick="mostrar('proveedores')">🚚 Proveedores</a>
+      <a href="#" onclick="mostrar('inventario')">📦 Inventario</a>
+      <a href="#" onclick="mostrar('compras')">🧾 Compras</a>
+      <a href="#" onclick="mostrar('personal')">👨‍🍳 Personal</a>
+      <a href="#" onclick="mostrar('configuracion')">⚙ Configuración</a>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main id="contenido">
+      <!-- Sección inicial -->
+      <section id="dashboard" class="card">
+        <h3>Bienvenido al Sistema</h3>
+        <p>Selecciona una opción en el menú para comenzar.</p>
+      </section>
+
+      <!-- Sucursales -->
+      <section id="sucursales" class="card" style="display:none;">
+        <h3>🏬 Sucursales</h3>
+        <table>
+          <tr><th>ID</th><th>Nombre</th><th>Dirección</th><th>Estado</th></tr>
+          <tr><td>1</td><td>Sucursal Principal</td><td>Dirección Principal</td><td>Activa</td></tr>
+          <tr><td>2</td><td>Sucursal 2</td><td>Dirección Sucursal 2</td><td>Activa</td></tr>
+        </table>
+      </section>
+
+      <!-- Productos -->
+      <section id="productos" class="card" style="display:none;">
+        <h3>🥦 Productos</h3>
+        <table>
+          <tr><th>ID</th><th>Producto</th><th>Categoría</th><th>Unidad</th></tr>
+          <tr><td>1</td><td>Verduras Mixtas</td><td>Verduras</td><td>Kg</td></tr>
+          <tr><td>2</td><td>Agua</td><td>Bebidas</td><td>Litro</td></tr>
+        </table>
+      </section>
+
+      <!-- Proveedores -->
+      <section id="proveedores" class="card" style="display:none;">
+        <h3>🚚 Proveedores</h3>
+        <p>Aquí se mostraría el listado de proveedores registrados.</p>
+      </section>
+
+      <!-- Inventario -->
+      <section id="inventario" class="card" style="display:none;">
+        <h3>📦 Inventario</h3>
+        <p>Consulta del stock actual por sucursal.</p>
+      </section>
+
+      <!-- Compras -->
+      <section id="compras" class="card" style="display:none;">
+        <h3>🧾 Compras</h3>
+        <p>Aquí se registrarían y visualizarían las compras realizadas a proveedores.</p>
+      </section>
+
+      <!-- Personal -->
+      <section id="personal" class="card" style="display:none;">
+        <h3>👨‍🍳 Personal</h3>
+        <p>Gestión de empleados de cada sucursal.</p>
+      </section>
+
+      <!-- Configuración -->
+      <section id="configuracion" class="card" style="display:none;">
+        <h3>⚙ Configuración</h3>
+        <p>Parámetros generales y log de actividades.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ====== FUNCION PARA CAMBIAR SECCIONES ======
+    function mostrar(seccion) {
+      const secciones = document.querySelectorAll("main section");
+      secciones.forEach(s => s.style.display = "none");
+      document.getElementById(seccion).style.display = "block";
+    }
+  </script>
 </body>
 </html>
